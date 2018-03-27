@@ -42,6 +42,18 @@ def instagram_login(browser):
     login_button = browser.find_element_by_css_selector("button._qv64e._gexxb._4tgw8._njrw0")
     login_button.click()
 
+def write_csv_file(parks_list):
+    fo = open("national_parks", "wb")
+    for park in parks_list:
+        if park[0] is not None:
+            fo.write(park[0])
+        fo.write(", ")
+        if park[1] is not None:
+            fo.write(park[1])
+        fo.write("\n")
+
+    fo.close()
+
 def get_url(park, browser):
     root = browser.find_element_by_id("react-root")
     root_html = root.get_attribute('innerHTML')
@@ -52,16 +64,16 @@ def get_url(park, browser):
         if "explore" in div["href"] and "locations"in div["href"]:
             links.append(div)
 
-    for link in links[0:-1]:
-        if link.find_all("span")[0].contents[0].encode('ascii', 'ignore') == park:
-            return instagram_base_url + link["href"]
+    for link in links[0:-2]:
+        if link.find_all("span") is not None and link.find_all("span")[0] is not None and link.find_all("span")[0].contents is not None and link.find_all("span")[0].contents[0].encode('ascii', 'ignore') == park:
+            return instagram_base_url + link["href"].encode('ascii', 'ignore')
 
 def go_to_national_park(park, browser):
     search_bar = browser.find_element_by_css_selector("input._avvq0._o716c")
     search_bar.clear()
     time.sleep(1)
     search_bar.send_keys(park)
-    time.sleep(1)
+    time.sleep(2)
     return get_url(park, browser)
 
 def get_parks_urls(browser):
@@ -70,6 +82,8 @@ def get_parks_urls(browser):
 
     for park in parks:
         parks_list.append([park, go_to_national_park(park, browser)])
+
+    write_csv_file(parks_list)
 
     print parks_list
 
