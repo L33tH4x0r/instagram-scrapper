@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup as soup
 from selenium import webdriver
 import time
 import csv
+import sys
 
 instagram_base_url = "https://www.instagram.com"
 
@@ -87,12 +88,11 @@ def get_parks_urls(browser):
 
     print parks_list
 
-def main():
-    browser = webdriver.Chrome("/home/austin/Projects/social_networks/instagram-scrapper/chromedriver")
+if __name__ == "__main__":
+        browser = webdriver.Chrome("/home/austin/Projects/social_networks/instagram-scrapper/chromedriver")
 
-    browser.get(instagram_base_url)
-    instagram_login(browser)
-
-    get_parks_urls(browser)
-
-main()
+        browser.get(instagram_base_url)
+        instagram_login(browser)
+        for arg in sys.argv:
+            if arg == "csv":
+                get_parks_urls(browser)
