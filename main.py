@@ -5,7 +5,17 @@ import time
 import csv
 import sys
 import psycopg2
+import os
+import sys
 
+# Globals
+global password
+global username
+global csv
+global browser
+global cur
+global con
+global instagram_base_url
 instagram_base_url = "https://www.instagram.com"
 
 def get_park_names():
@@ -30,7 +40,7 @@ def get_park_names():
 
     return parks
 
-def instagram_login(browser):
+def instagram_login():
     NEXT_BUTTON_XPATH = '//a[@href="/accounts/login/"]'
     button = browser.find_element_by_xpath(NEXT_BUTTON_XPATH)
     button.click()
@@ -56,7 +66,7 @@ def write_csv_file(parks_list):
 
     fo.close()
 
-def get_url(park, browser):
+def get_url(park):
     root = browser.find_element_by_id("react-root")
     root_html = root.get_attribute('innerHTML')
     react_soup = soup(root_html, "html.parser")
@@ -70,38 +80,58 @@ def get_url(park, browser):
         if link.find_all("span") is not None and link.find_all("span")[0] is not None and link.find_all("span")[0].contents is not None and link.find_all("span")[0].contents[0].encode('ascii', 'ignore') == park:
             return instagram_base_url + link["href"].encode('ascii', 'ignore')
 
-def go_to_national_park(park, browser):
+def go_to_national_park(park):
     search_bar = browser.find_element_by_css_selector("input._avvq0._o716c")
     search_bar.clear()
     time.sleep(1)
     search_bar.send_keys(park)
     time.sleep(2)
-    return get_url(park, browser)
+    return get_url(park)
 
-def get_parks_urls(browser):
+def get_parks_urls():
     parks = get_park_names()
     parks_list = [["Park", "Url"]]
 
     for park in parks:
-        parks_list.append([park, go_to_national_park(park, browser)])
+        parks_list.append([park, go_to_national_park(park)])
 
     write_csv_file(parks_list)
 
     print parks_list
 
-def setup_database():
+def setup_database(username, password):
+    # Check if database exists
+    con = psycopg2.connect("dbname='instagramresults' user='austin' host='localhost' password='%s'" % password )
+    cur = con.cursor()
+    cur.execute('SELECT 1 from Post')
+    # try:
+    # except:
+        # print "Database Not found"
+def check_parameters():
+    password = ''
+    username = ''
+    for arg in sys.argv:
+        if arg == "csv":
+            csv = True
+        else if 'password' in arg:
+            password = arg.split("=")[-1]
+        else if 'username' in arg:
+            username = arg.split("=")[-1]
 
-    try:
-        conn = psycopg2.connect("dbname='instagramresults' user='austin' host='localhost' password=''")
-    except:
-        print "I am unable to connect to the database"
-
+    if password = '':
+        print "You need to supply a password"
+        sys.exit()
+    else if username = '':
+        print "You need to supply a username"
+        sys.exit()
 
 if __name__ == "__main__":
-        browser = webdriver.Chrome("/home/austin/Projects/social_networks/instagram-scrapper/chromedriver")
-        setup_database
-        browser.get(instagram_base_url)
-        instagram_login(browser)
-        for arg in sys.argv:
-            if arg == "csv":
-                get_parks_urls(browser)
+    check_paramters()
+    setup_database(username, password)
+
+    browser = webdriver.Chrome(os.getcwd() + "/chromedriver")
+    browser.get(instagram_base_url)
+
+    if csv:
+        get_parks_urls()
+    instagram_login()
