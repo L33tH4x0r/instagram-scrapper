@@ -6,9 +6,9 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 class Instagram:
-
     def __init__(self):
-        self.browser = webdriver.Chrome(os.getcwd() + "/chromedriver").get("https://www.instagram.com")
+        self.browser = webdriver.Chrome(os.getcwd() + "/chromedriver")
+        self.browser.get("https://www.instagram.com")
         time.sleep(1)
 
     def login(self):
