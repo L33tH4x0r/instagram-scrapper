@@ -9,13 +9,12 @@ import os
 import sys
 
 # Globals
-global password
-global username
 global csv
 global browser
 global cur
 global con
 global instagram_base_url
+global search_park
 instagram_base_url = "https://www.instagram.com"
 
 def get_park_names():
@@ -103,6 +102,10 @@ def check_parameters():
     for arg in sys.argv:
         if arg == "csv":
             csv = True
+        else if "park" in arg:
+            search_park = arg.split(":")[-1]
+            if search_park[0] == ' ':
+                search_park = search_park[1:]
 
 if __name__ == "__main__":
     check_paramters()
@@ -110,8 +113,7 @@ if __name__ == "__main__":
     browser = webdriver.Chrome(os.getcwd() + "/chromedriver")
     browser.get(instagram_base_url)
 
-    if csv:
-        get_parks_urls()
     instagram_login()
 
-    
+    if csv:
+        get_parks_urls()
