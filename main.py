@@ -99,35 +99,13 @@ def get_parks_urls():
 
     print parks_list
 
-def setup_database(username, password):
-    # Check if database exists
-    con = psycopg2.connect("dbname='instagramresults' user='austin' host='localhost' password='%s'" % password )
-    cur = con.cursor()
-    cur.execute('SELECT 1 from Post')
-    # try:
-    # except:
-        # print "Database Not found"
 def check_parameters():
-    password = ''
-    username = ''
     for arg in sys.argv:
         if arg == "csv":
             csv = True
-        else if 'password' in arg:
-            password = arg.split("=")[-1]
-        else if 'username' in arg:
-            username = arg.split("=")[-1]
-
-    if password = '':
-        print "You need to supply a password"
-        sys.exit()
-    else if username = '':
-        print "You need to supply a username"
-        sys.exit()
 
 if __name__ == "__main__":
     check_paramters()
-    setup_database(username, password)
 
     browser = webdriver.Chrome(os.getcwd() + "/chromedriver")
     browser.get(instagram_base_url)
@@ -135,3 +113,5 @@ if __name__ == "__main__":
     if csv:
         get_parks_urls()
     instagram_login()
+
+    
